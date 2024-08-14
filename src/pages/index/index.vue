@@ -23,10 +23,18 @@ export default {
 
 <style>
 .content {
-  display: flex;
+  /* display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: center; */
+  width: 100%;
+  height: 100%;
+  position: absolute;
+}
+
+/** 将画布边界置为0 */
+canvas {
+  border: 0 !important;
 }
 
 .logo {
