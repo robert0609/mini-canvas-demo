@@ -1,6 +1,6 @@
 {
   "component": true,
   "usingComponents": {
-    "cax": "../cax/cax.js"
+    "cax": "../cax/cax"
   }
 }
