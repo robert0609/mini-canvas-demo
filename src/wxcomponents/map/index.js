@@ -7,8 +7,10 @@ Component({
       //比 web 里使用 cax 多传递 this，this 代表 Page 或 Component 的实例
       const windowInfo = wx.getWindowInfo()
       const stage = new cax.Stage(windowInfo.windowWidth, windowInfo.windowHeight, 'myCanvas', this);
+      //每秒检测两次
+      stage.moveDetectionInterval = 500
 
-      const bitmap = new cax.Bitmap('https://h5-static-test.xunbaoji.net.cn/batman.jpg')
+      const bitmap = new cax.Bitmap('https://admin.xunbaoji.net.cn/uploads/20240807/70d2147f4bdde85410914058595e1bcb.png')
       stage.add(bitmap);
 
       //#region 触摸事件逻辑，实现单指拖拽平移和双指缩放的交互
@@ -64,12 +66,28 @@ Component({
             const newDistanceBetweenTwoFingers = Math.sqrt(Math.pow(e.touches[0].pageX - e.touches[1].pageX, 2) + Math.pow(e.touches[0].pageY - e.touches[1].pageY, 2));
             if (newDistanceBetweenTwoFingers > distanceBetweenTwoFingers) {
               // 放大
-              stage.scaleX += 0.01;
-              stage.scaleY += 0.01;
+              if (bitmap.scaleX >= 2) {
+                bitmap.scaleX = 2;
+              } else {
+                bitmap.scaleX += 0.02;
+              }
+              if (bitmap.scaleY >= 2) {
+                bitmap.scaleY = 2;
+              } else {
+                bitmap.scaleY += 0.02;
+              }
             } else if (newDistanceBetweenTwoFingers < distanceBetweenTwoFingers) {
               // 缩小
-              stage.scaleX -= 0.01;
-              stage.scaleY -= 0.01;
+              if (bitmap.scaleX <= 0.5) {
+                bitmap.scaleX = 0.5;
+              } else {
+                bitmap.scaleX -= 0.02;
+              }
+              if (bitmap.scaleY <= 0.5) {
+                bitmap.scaleY = 0.5;
+              } else {
+                bitmap.scaleY -= 0.02;
+              }
             }
 
             fingerPosition1 = { x: e.touches[0].pageX, y: e.touches[0].pageY };
