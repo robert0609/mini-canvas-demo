@@ -21,6 +21,10 @@ Component({
       let fingerPosition2 = undefined;
       let distanceBetweenTwoFingers = undefined;
 
+      // 双指缩放的时候，两个指头触摸点的中间点
+      let middleLocationInImage = undefined;
+      let middleLocationInStage = undefined;
+
       const handleTouches = (e) => {
         fingerCount = e.touches.length;
         switch (fingerCount) {
@@ -28,6 +32,8 @@ Component({
             fingerPosition1 = undefined;
             fingerPosition2 = undefined;
             distanceBetweenTwoFingers = undefined;
+            middleLocationInImage = undefined;
+            middleLocationInStage = undefined;
             break;
           }
           case 1: {
@@ -35,12 +41,27 @@ Component({
             fingerPosition1 = { x: e.touches[0].pageX, y: e.touches[0].pageY };
             fingerPosition2 = undefined;
             distanceBetweenTwoFingers = undefined;
+            middleLocationInImage = undefined;
+            middleLocationInStage = undefined;
             break;
           }
           case 2: {
+            // 此时进入双指缩放操作
             fingerPosition1 = { x: e.touches[0].pageX, y: e.touches[0].pageY };
             fingerPosition2 = { x: e.touches[1].pageX, y: e.touches[1].pageY };
             distanceBetweenTwoFingers = Math.sqrt(Math.pow(fingerPosition1.x - fingerPosition2.x, 2) + Math.pow(fingerPosition1.y - fingerPosition2.y, 2));
+            
+            // 先计算出stage下的中心点位置
+            middleLocationInStage = {
+              x: (fingerPosition1.x + fingerPosition2.x) / 2,
+              y: (fingerPosition1.y + fingerPosition2.y) / 2
+            };
+            const matrixOfImage = bitmap._matrix;
+            middleLocationInImage = {
+              x: (middleLocationInStage.x - matrixOfImage.tx) / matrixOfImage.a,
+              y: (middleLocationInStage.y - matrixOfImage.ty) / matrixOfImage.d
+            };
+
             break;
           }
           default: {}
@@ -60,6 +81,8 @@ Component({
             fingerPosition1 = { x: e.touches[0].pageX, y: e.touches[0].pageY };
             fingerPosition2 = undefined;
             distanceBetweenTwoFingers = undefined;
+            middleLocationInImage = undefined;
+            middleLocationInStage = undefined;
             break;
           }
           case 2: {
@@ -89,6 +112,11 @@ Component({
                 bitmap.scaleY -= 0.02;
               }
             }
+            // 为了保障缩放时焦点位置不动，这里需要换算一个新的平移向量
+            const tx = middleLocationInStage.x - bitmap.scaleX * middleLocationInImage.x;
+            const ty = middleLocationInStage.y - bitmap.scaleY * middleLocationInImage.y;
+            bitmap.x = tx;
+            bitmap.y = ty;
 
             fingerPosition1 = { x: e.touches[0].pageX, y: e.touches[0].pageY };
             fingerPosition2 = { x: e.touches[1].pageX, y: e.touches[1].pageY };
